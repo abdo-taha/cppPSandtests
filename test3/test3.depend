@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1534874431 source:f:\cppprojects\test3\main.cpp
+	<iostream>
+	<assert.h>
+	<algorithm>
+

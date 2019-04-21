@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1535014769 source:f:\cppprojects\test5\main.cpp
+	<iostream>
+	<assert.h>
+	<math.h>
+

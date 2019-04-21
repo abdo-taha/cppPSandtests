@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1535361079 source:f:\cppprojects\primes\main.cpp
+	<iostream>
+	<math.h>
+
