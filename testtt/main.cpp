@@ -29,48 +29,26 @@ int nexty( int x , int y )
     if( validPosition(x,y+1) ) return y+1 ;
     return 0 ;
 }
-int previousx( int x , int y )
-{
-    if( validPosition(x,y-1) ) return x;
-    return x-1 ;
-}
-int previousy( int x , int y )
-{
-    if(validPosition(x,y-1)) return y-1 ;
-    return n -1 ;
-}
 bool valid(int x , int y , int p ) // x , y are  valid position
 {
     if(p == 0 ) return 1 ;
-    if(p == 1 )
+    if(p == 2 )
         {
-            if(validPosition(x-1,y+1) && arr[x-1][y+1] == 1 )
+            if(validPosition(x-1,y+1) && arr[x-1][y+1] == 2 )
                 return 0 ;
-            if(validPosition(x+1,y-1) &&  arr[x+1][y-1] == 1 )
+            if(validPosition(x,y-1) && arr[x][y-1]==1)
                 return 0 ;
-            if(validPosition(x,y+1) && arr[x][y+1]==2)
-                return 0 ;
-            if(validPosition(x,y-1) && arr[x][y-1]==2)
-                return 0 ;
-            if(validPosition(x+1,y) && arr[x+1][y]==2)
-                return 0 ;
-            if(validPosition(x-1,y) && arr[x-1][y]==2)
+            if(validPosition(x-1,y) && arr[x-1][y]==1)
                 return 0 ;
             return 1 ;
         }
     else
     {
-        if(validPosition(x-1,y-1) && arr[x-1][y-1] == 2 )
+        if(validPosition(x-1,y-1) && arr[x-1][y-1] == 1 )
             return 0 ;
-        if(validPosition(x+1,y+1) && arr[x+1][y+1]==2 )
-            return 0 ;
-        if(validPosition(x+1,y) && arr[x+1][y] == 1 )
+        if(validPosition(x-1,y) && arr[x-1][y] == 2 )
              return 0 ;
-        if(validPosition(x-1,y) && arr[x-1][y] == 1 )
-             return 0 ;
-        if(validPosition(x,y+1) && arr[x][y+1] == 1 )
-             return 0 ;
-        if(validPosition(x,y-1) && arr[x][y-1] == 1 )
+        if(validPosition(x,y-1) && arr[x][y-1] == 2 )
             return 0 ;
         return 1 ;
     }

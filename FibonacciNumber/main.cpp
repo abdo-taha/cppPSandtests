@@ -14,7 +14,8 @@ int main()
         numbers.push_back(t) ;
     }
     --n ;
-    cout << numbers[n] ;
+    if(n == -1) cout << 0 ;
+    else cout << numbers[n] ;
 
     return 0;
 }
