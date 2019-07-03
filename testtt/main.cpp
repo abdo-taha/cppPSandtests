@@ -55,11 +55,7 @@ bool valid(int x , int y , int p ) // x , y are  valid position
 }
 void solve(int x , int y , int c )
 {
-    if(c == d  )
-    {
-        done = 1 ;
-        return ;
-    }
+    if(done  ) return ;
     for(int i = 2 ; i >= 0; --i)
     {
 
@@ -69,9 +65,17 @@ void solve(int x , int y , int c )
 
             arr[x][y] = i ;
             if(i != 0) ++c ;
-            print();
+            //print();
             if(validPosition(nextx(x,y) , nexty(x,y)))
                 solve( nextx(x,y) , nexty(x,y) , c  ) ;
+            else
+            {
+                if(c == d)
+                {
+                    done = 1 ;
+                    return ;
+                }
+            }
             if(done) return ;
             if(i!=0)
             {--c ;
@@ -90,6 +94,7 @@ int main()
 
     solve(0,0,0) ;
     print() ;
-    cout << done ;
+
+
     return 0;
 }
