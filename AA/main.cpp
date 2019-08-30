@@ -3,43 +3,26 @@ using namespace std ;
 #define ll  long long
 #define lp(i,a,n) for(ll i = a;i<n;++i)
 
+ll dp[1000] ;
 
-string s ;
+ll fibo( int n) {
+    if(n == 1 || n == 2) return 1 ;
+    if(dp[n]!= 0) return dp[n];
+    else return dp[n] = fibo( n-1  ) + fibo( n-2) ;
+
+}
+
 
 int main()
 {
     ios::sync_with_stdio(0);
-    ll c = 0;
-    cin >> s;
-    reverse(s.begin(), s.end());
-    bool big = 0 ;
-    for(char i : s){
 
-        int k = i-'0' ;
-        if(big) ++k;
-        //cout << k << ' ';
-        if( k == 10 ) big = 1 ;
+    while(1) {
 
-        else if( k > 5 || ( k==5&& big) ) {
-            big = 1 ;
-            c += 10 - k ;
-        }
-        else {
-            //if(big) ++c;
-            big = 0 ;
-            c += k;
-        }
-        //cout << c << endl;
-
-
-
-
-
+        int n;
+        cin >> n ;
+        cout << fibo(n) << endl;
     }
-    if(big) ++c;
-    cout << c << endl;
-
-
 
     return 0;
 }
