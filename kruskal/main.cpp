@@ -80,10 +80,10 @@ pair<int , vector<edge> > MST_Kruskal( vector<edge> edgelist ,int n  ) {
         edge e = q.top() ; q.pop();
         if( uf.union_sets(e.from , e.to) ){
             mstcost += e.w;
-            edgelist.push_back(e);
+            edges.push_back(e);
         }
     }
-    if( edgelist.size() != n-1 ) return make_pair( -OO , vector<edge>() ) ;
+    if( edges.size() != n-1 ) return make_pair( -OO , vector<edge>() ) ;
 
     return make_pair( mstcost , edges ) ;
 
