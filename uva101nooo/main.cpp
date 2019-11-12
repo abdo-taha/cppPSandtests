@@ -56,7 +56,7 @@ int main()
 {
     ios::sync_with_stdio(0);
 //    cin.tie(0);
-    freopen( "output.txt" , "w" , stdout ) ;
+//    freopen( "output.txt" , "w" , stdout ) ;
 //    freopen( "input.txt" , "r" , stdin ) ;
 
     cin >> n ;
@@ -72,34 +72,41 @@ int main()
         bool y = s2 =="onto" ;
         if( top(a) == top(b) ) continue;
 
-        if( x ) clean(a);
-        else if( down[a] != a ){
-            int t = down[a];
+        int t = down[a];
+        if(t!= a) {
             up[t] = t ;
+        }
+
+        if(x&&y){
+
+            clean(a);
+            t = up[b];
+            if(t != b) {
+                clean(t);
+            }
 
         }
-        if( y ){
+        else if( x && !y ){
 
-            cleanb(b);
+            clean(a);
+            b = top(b);
+        }
+        else if( !x&& y ){
+
+            t = up[b] ;
+            if(t != b ){
+                clean(t);
+            }
 
         }
         else{
-
             b = top(b);
-
         }
+
 
         down[a] = b ;
         up[b] = a ;
-//                        string nl ="";
-//                    lp(i,0,n){
-//                        cout << nl << i <<":" ;
-//                        nl = "\n";
-//                        if( down[i] == i ){
-//                            print(i);
-//                        }
-//
-//                    }cout <<endl;
+
 
 
     }
