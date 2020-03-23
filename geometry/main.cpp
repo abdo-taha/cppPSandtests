@@ -87,6 +87,18 @@ double distToSegment( point p0, point p1, point p2 ) {
 	return length(p2 - (p0 + v1*t) );
 }
 
+int orientation(point p1, point p2, point p3)
+{
+
+    int val = (p2.Y - p1.Y) * (p3.X - p2.X) -
+              (p2.X - p1.X) * (p3.Y - p2.Y);
+
+    if (val == 0) return 0;  // colinear
+
+    return (val > 0)? 1: 2; // clock or counterclock wise
+}
+
+
 struct line {
 	double a, b, c; // ax + by + c = 0
 };
@@ -140,6 +152,57 @@ void pointAngleToLine(point p , double theta , line &l){
 
 
 
+
+bool intersectSegments(point a, point b, point c, point d, point & intersect) {
+  double d1 = cp(a - b, d - c), d2 = cp(a - c, d - c), d3 = cp(a - b, a - c);
+  if (fabs(d1) < EPS)
+    return false;  // Parllel || identical
+
+  double t1 = d2 / d1, t2 = d3 / d1;
+  intersect = a + (b - a) * t1;
+    /// till here they intersecting lines
+    /// t1 for ab t2 for cd
+    /// t1<-eps is not on ray ab t2 < -eps not on ray cd
+    ///  t2 < -EPS || t2 > 1 + EPS not on segment cd
+    ///  t1 < -EPS || t1 > 1 + EPS not on segment ab
+
+  if (t1 < -EPS || t2 < -EPS || t2 > 1 + EPS)
+    return false;  //e.g ab is ray, cd is segment ... change to whatever
+  return true;
+}
+
+// Where is P2 relative to segment p0-p1?
+// ccw = +1 => angle > 0 or collinear after p1
+// cw = -1 => angle < 0 or collinear after p0
+// Undefined = 0 => Collinar in range [a, b]. Be careful here
+int ccw(point a, point b, point c) {
+  point v1(b - a), v2(c - a);
+  double t = cp(v1, v2);
+
+  if (t > +EPS)
+	return +1;
+  if (t < -EPS)
+	return -1;
+  if (v1.X * v2.X < -EPS || v1.Y * v2.Y < -EPS)
+	return -1;
+  if (norm(v1) < norm(v2) - EPS)
+	return +1;
+  return 0;
+}
+
+bool intersect(point p1, point p2, point p3, point p4) {
+    // special case handling if a segment is just a point
+    bool x = (p1 == p2), y = (p3==p4);
+    if(x && y)  return p1 == p3;
+    if(x)   return ccw(p3, p4, p1) == 0;
+    if(y)   return ccw(p1, p2, p3) == 0;
+
+    return  ccw(p1, p2, p3) * ccw(p1, p2, p4) <= 0  &&
+        ccw(p3, p4, p1) * ccw(p3, p4, p2) <= 0;
+  }
+
+
+
                                     /** triangles **/
 
 
@@ -187,18 +250,123 @@ double triangleArea(double a , double b, double c , bool m = 0){
     return area;
 }
 
+
+
+double ang3Points(point b , point a , point c){
+    double la = length( b-c ) , lb = length( a-c ) , lc = length( a-b );
+    return getAngle_A_abc(la,lb,lc);
+
+}
+
+
          /** circles **/
 
 
 
 double sectorLength( double angle , double r , bool deg = 1){
-    if(!deg) angle = RAD_to_DEG(deg);
-    return deg / 360.0 * 2 * PI * r;
+    if(!deg) angle = RAD_to_DEG(angle);
+    return angle / 360.0 * 2 * PI * r;
 }
 double sectionArea(double angle , double r , bool deg = 1){
-    if(!deg) angle = RAD_to_DEG(deg);
-    return deg / 360.0  * PI * r * r;
+    if(!deg) angle = RAD_to_DEG(angle);
+    return angle / 360.0  * PI * r * r;
 }
+
+// 2 points has infinite circles
+// Find circle passes with 3 points, some times, there is no circle! (in case colinear)
+// Draw two perpendicular lines and intersect them
+// may be see https://www.topcoder.com/community/data-science/data-science-tutorials/geometry-concepts-line-intersection-and-its-applications/
+pair<double, point> findCircle(point a, point b, point c) {
+	//create median, vector, its prependicular
+	point m1 = (b+a)*0.5, v1 = b-a, pv1 = point(v1.Y, -v1.X);
+	point m2 = (b+c)*0.5, v2 = b-c, pv2 = point(v2.Y, -v2.X);
+	point end1 = m1+pv1, end2 = m2+pv2, center;
+	intersectSegments(m1, end1, m2, end2, center);
+	return make_pair( length(a-center), center );
+}
+
+// If line intersect cirlce at point p, and p = p0 + t(p1-p0)
+// Then (p-c)(p-c) = r^2 substitute p and rearrange
+// (p1-p0)(p1-p0)t^2 + 2(p1-p0)(p0-C)t + (p0-C)(p0-C) = r*r; -> Quadratic
+vector<point> intersectLineCircle(point p0, point p1, point C, double r) {
+    double a = dp(p1-p0, p1-p0), b = 2*dp(p1-p0, p0-C),
+           c = dp(p0-C, p0-C) - r*r;
+    double f = b*b - 4*a*c;
+
+    vector<point> v;
+    if( dcmp(f, 0) >= 0) {
+	    if( dcmp(f, 0) == 0)	f = 0;
+	    double t1 =(-b + sqrt(f))/(2*a);
+	    double t2 =(-b - sqrt(f))/(2*a);
+	    v.push_back( p0 + t1*(p1-p0) );
+	    if( dcmp(f, 0) != 0)	v.push_back( p0 + t2*(p1-p0) );
+    }
+    return v;
+}
+
+vector<point> intersectCircleCircle(point c1, double r1, point c2, double r2) {
+  // Handle infinity case first: same center/radius and r > 0
+  if (same(c1, c2) && dcmp(r1, r2) == 0 && dcmp(r1, 0) > 0)
+    return vector<point>(3, c1);    // infinity 2 same circles (not points)
+
+  // Compute 2 intersection case and handle 0, 1, 2 cases
+  double ang1 = angle(c2 - c1), ang2 = getAngle_A_abc(r2, r1, length(c2 - c1));
+
+  if(isnan(ang2)) // if r1 or d = 0 => nan in getAngle_A_abc (/0)
+    ang2 = 0; // fix corruption
+
+  vector<point> v(1, polar(r1, ang1 + ang2) + c1);
+
+  // if point NOT on the 2 circles = no intersection
+  if(dcmp(dp(v[0]-c1, v[0]-c1), r1*r1) != 0 ||
+      dcmp(dp(v[0]-c2, v[0]-c2), r2*r2) != 0 )
+    return vector<point>();
+
+  v.push_back(polar(r1, ang1 - ang2) + c1);
+  if(same(v[0], v[1]))  // if same, then 1 intersection only
+    v.pop_back();
+  return v;
+}
+
+
+const int MAX = 100000+9;
+point pnts[MAX], r[3], cen;
+double rad;
+int ps, rs;	// ps = n, rs = 0, initially
+
+// Pre condition
+// random_shuffle(pnts, pnts+ps);		rs = 0;
+void MEC() {
+	if(ps == 0 && rs == 2) {
+		cen = (r[0]+r[1])/2.0;
+		rad = length(r[0]-cen);
+	}
+	else if(rs == 3) {
+		pair<double, point> p = findCircle(r[0], r[1], r[2]);
+		cen = p.second;
+		rad = p.first;
+	}
+	else if(ps == 0) {
+		cen = r[0];	// sometime be garbage, but will not affect
+		rad = 0;
+	}
+	else {
+		ps--;
+		MEC();
+
+		if(length(pnts[ps]-cen) > rad) {
+			r[rs++] = pnts[ps];
+			MEC();
+			rs--;
+		}
+
+		ps++;
+	}
+}
+
+
+
+
 
 
 int main()

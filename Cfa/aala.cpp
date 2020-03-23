@@ -1,53 +1,79 @@
 #include <bits/stdc++.h>
+
 using namespace std;
-const int OO = (int ) 2*1e9;
-#define lp(i,a,n) for(long long i = a ; i < n ; ++i)
-#define rep(i,vec) for(ll i = 0 ; i < vec.size() ; ++i)
-#define reprv(i,vec) for(ll i = vec.size()-1; i >=0 ; --i)
-#define eps (1e-5)
-#define pb(i) push_back(i)
-typedef vector<int> vi ;
-typedef   long long ll;
-typedef vector<ll> vll ;
-typedef pair<int,int> pii ;
-typedef vector< pair<int,int> >  vpii;
-typedef vector<vector<int> > vvi ;
 
+const int N = (2<<20) + 4, mod = 1e9+7;
 
-int x , n , t , m , a , b;
+int n ;
+long long A[N] , f[N];
+long long c[2][N];
 
-vi   times ,costs;
-vvi roads ;
-
-int mn[1005][1005];
-
-
-void solve( int pos , int tme , int cst , int prv){
-
-    cst += costs[pos];
-    //cout << pos << " "<<tme<<" " << cst <<" " <<prv  <<endl;
-    if( tme > x ) return ;
-    if( cst > mn[pos][tme]) return ;
-    mn[pos][tme] = cst ;
-
-    rep(i, roads[pos] ){
-        solve( roads[pos][i] , tme + times[pos] + t , cst, pos ) ;
+void make(int dir)
+{
+    if(dir)
+    {
+        reverse(A +1, A+n+1);
     }
-    solve( pos , tme + times[pos] , cst, pos ) ;
-
-
+    stack<int> s1;
+    s1.push(0);
+    for(int i = 1;i<=n;i++)
+    {
+        if(A[i] > A[i-1])
+        {
+            c[dir][i] =c[dir][i-1] + A[i];
+        }
+        else
+        {
+            while( s1.size() && A[s1.top()] > A[i] )
+            {
+                s1.pop();
+            }
+            int j =s1.top();
+            c[dir][i] = c[dir][j] + (i-j)*A[i];
+        }
+        s1.push(i);
+    }
+    if(dir)
+    {
+        reverse(c[dir]+1 , c[dir]+n+1);
+    }
 }
+
 
 int main()
 {
-    ios::sync_with_stdio(0);
-//    cin.tie(0);
-//    freopen( "output.txt" , "w" , stdout ) ;
-//    freopen( "input.txt" , "r" , stdin ) ;
-    int a = 2000000000;
-    cout << a ;
+    cin>>n;
+    for(int i = 1;i<=n;i++)
+        cin>>A[i];
+    make(0);
+    make(1);
+    long long sol = 0;
+    int idx = 0;
+    for(int i = 0;i<=n;i++)
+    {
+        if(c[0][i] + c[1][i+1] >sol)
+        {
+            sol = c[0][i] + c[1][i+1];
+            idx = i;
+        }
+    }
+    reverse(A+1, A+n+1);
 
-
-
+    for(int i = 1 ; i < n+1 ; ++i) cout << c[0][i]<< " ";
+//    long long nw = A[idx];
+//    for(int j = idx;j>0;j--)
+//    {
+//        nw = min(nw , A[j]);
+//        f[j] = nw;
+//    }
+//    nw = A[idx+1];
+//    for(int j = idx+1;j<=n;j++)
+//    {
+//        nw = min(nw , A[j]);
+//        f[j] = nw;
+//    }
+//    for(int i = 1;i<=n;i++)
+//        cout<<f[i]<<" ";
     return 0;
 }
+
